@@ -138,11 +138,11 @@ export default function Page() {
           </a>
           <nav className="hidden gap-1 md:flex">
             {["Features", "Shop", "Performance", "Specs"].map((x) => (
-              <a key={x} href={`#${x === "Shop" ? "shop" : x.toLowerCase()}`} className="rounded-lg px-3 py-2 text-sm text-white/60 transition hover:bg-white/5 hover:text-white">{x}</a>
+              <a key={x} href={x === "Shop" ? "/shop" : `#${x.toLowerCase()}`} className="rounded-lg px-3 py-2 text-sm text-white/60 transition hover:bg-white/5 hover:text-white">{x}</a>
             ))}
           </nav>
           <div className="flex items-center gap-3">
-            <a href="#" className="rounded-lg bg-flame px-5 py-2.5 font-display text-sm font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Shop Now</a>
+            <a href="/shop" className="rounded-lg bg-flame px-5 py-2.5 font-display text-sm font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Shop Now</a>
             <button className="flex flex-col gap-1.5 p-2 md:hidden" onClick={() => setMenu((m) => !m)} aria-label="Menu">
               <span className="h-0.5 w-6 bg-white" /><span className="h-0.5 w-6 bg-white" /><span className="h-0.5 w-6 bg-white" />
             </button>
@@ -151,7 +151,7 @@ export default function Page() {
         {menu && (
           <div className="mx-4 mt-2 rounded-xl glass p-2 md:hidden">
             {["Features", "Shop", "Performance", "Specs"].map((x) => (
-              <a key={x} href={`#${x === "Shop" ? "shop" : x.toLowerCase()}`} onClick={() => setMenu(false)} className="block rounded-lg px-4 py-3 text-white/70">{x}</a>
+              <a key={x} href={x === "Shop" ? "/shop" : `#${x.toLowerCase()}`} onClick={() => setMenu(false)} className="block rounded-lg px-4 py-3 text-white/70">{x}</a>
             ))}
           </div>
         )}
@@ -169,7 +169,7 @@ export default function Page() {
             <div>
               <div className="font-display text-xs font-bold uppercase tracking-[0.4em] text-flame">Performance Tyre Co. · Est. 1993</div>
               <h1 id="hero-title" className="font-display mt-3 text-[clamp(3rem,13vw,10rem)] font-extrabold leading-[0.95] pb-[0.12em] pr-[0.06em] text-glow">
-                GRIP <span className="flame-text">93</span>
+                GRIP <span className="flame-text inline-block pr-[0.12em]">93</span>
               </h1>
             </div>
             <div>

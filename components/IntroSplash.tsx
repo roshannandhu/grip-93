@@ -148,6 +148,24 @@ export default function IntroSplash({
       gsap.set([grip.current, nine.current], { opacity: 0 });
       gsap.set(ring.current, { opacity: 0, scale: 0 });
 
+      // MEASURE the shared-element morph NOW — before the fromTo tweens below, whose
+      // immediateRender:true would fling the letters off-screen and corrupt the measurement.
+      // (opacity sets above don't affect layout, so the wordmark is at its natural centred box.)
+      const heroEl = typeof document !== "undefined" ? document.getElementById("hero-title") : null;
+      const wordEl = word.current;
+      let morph: { x: number; y: number; scale: number } | null = null;
+      if (heroEl && wordEl) {
+        const h = heroEl.getBoundingClientRect();
+        const w = wordEl.getBoundingClientRect();
+        if (w.width && h.width) {
+          morph = {
+            scale: h.width / w.width,
+            x: h.left + h.width / 2 - (w.left + w.width / 2),
+            y: h.top + h.height / 2 - (w.top + w.height / 2),
+          };
+        }
+      }
+
       const tl = gsap.timeline({ defaults: { ease: "power3.out" }, onComplete: finish });
       tlRef.current = tl;
 
@@ -175,18 +193,11 @@ export default function IntroSplash({
       }
 
       // 4) hand-off: morph the splash "GRIP 93" into the hero title (shared-element transition)
-      const heroEl = typeof document !== "undefined" ? document.getElementById("hero-title") : null;
-      const wordEl = word.current;
       const MORPH = 2.2;
-      if (heroEl && wordEl) {
-        const h = heroEl.getBoundingClientRect();
-        const w = wordEl.getBoundingClientRect();
-        const scale = w.width ? h.width / w.width : 1;
-        const x = h.left + h.width / 2 - (w.left + w.width / 2);
-        const y = h.top + h.height / 2 - (w.top + w.height / 2);
+      if (morph && wordEl) {
         tl.add(() => onReveal?.(), MORPH); // reveal hero behind the splash as the morph begins
         tl.to(canvas.current, { opacity: 0, duration: 0.5, ease: "power1.out" }, MORPH);
-        tl.to(wordEl, { x, y, scale, duration: 0.85, ease: "power3.inOut" }, MORPH);
+        tl.to(wordEl, { x: morph.x, y: morph.y, scale: morph.scale, duration: 0.85, ease: "power3.inOut" }, MORPH);
         // crossfade the splash out — the identical hero title is now in the same spot
         tl.to(root.current, { opacity: 0, duration: 0.35, ease: "power2.out" }, MORPH + 0.72);
       } else {
@@ -217,7 +228,7 @@ export default function IntroSplash({
           </div>
           <h1 ref={word} className="font-display relative z-10 flex items-center gap-3 text-[clamp(3rem,14vw,11rem)] font-extrabold leading-[0.95] pb-[0.12em] text-glow">
             <span ref={grip} className="inline-block" style={{ opacity: 0 }}>GRIP</span>
-            <span ref={nine} className="flame-text inline-block" style={{ opacity: 0 }}>93</span>
+            <span ref={nine} className="flame-text inline-block pr-[0.12em]" style={{ opacity: 0 }}>93</span>
           </h1>
         </div>
       </div>
