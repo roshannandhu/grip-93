@@ -65,21 +65,6 @@ html.lenis, html.lenis body { height: auto; }
 .floaty { animation: floaty 4s ease-in-out infinite; }
 
 /* ---- cinematic intro splash ---- */
-.smoke-puff {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  border-radius: 9999px;
-  /* layered off-centre gradients → irregular, cloud-like density instead of a flat disc */
-  background:
-    radial-gradient(circle at 38% 38%, rgba(228,228,233,0.55), rgba(228,228,233,0) 58%),
-    radial-gradient(circle at 66% 58%, rgba(188,188,198,0.45), rgba(188,188,198,0) 60%),
-    radial-gradient(circle at 50% 70%, rgba(150,150,162,0.38), rgba(150,150,162,0) 68%);
-  filter: blur(14px);
-  mix-blend-mode: screen; /* overlapping puffs accumulate into volume, like real smoke */
-  will-change: transform, opacity;
-  pointer-events: none;
-}
 .shock-ring {
   position: absolute;
   border-radius: 9999px;

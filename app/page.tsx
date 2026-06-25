@@ -38,7 +38,13 @@ type Lenis = { stop: () => void; start: () => void };
 export default function Page() {
   const [menu, setMenu] = useState(false);
   const introRef = useRef<IntroState>({ active: false, t: 0, kick: 0 });
+  const endedRef = useRef(false);
   const [phase, setPhase] = useState<"boot" | "intro" | "done">("boot");
+
+  const unlockScroll = () => {
+    document.body.style.overflow = "";
+    (window as unknown as { __lenis?: Lenis }).__lenis?.start();
+  };
 
   // decide intro vs skip (once per session, respect reduced motion) + lock scroll while playing
   useEffect(() => {
@@ -50,17 +56,20 @@ export default function Page() {
     }
     introRef.current.active = true;
     setPhase("intro");
-    const lenis = (window as unknown as { __lenis?: Lenis }).__lenis;
-    lenis?.stop();
+    (window as unknown as { __lenis?: Lenis }).__lenis?.stop();
     document.body.style.overflow = "hidden";
     window.scrollTo(0, 0);
+    // safety: if the page unmounts mid-intro, never leave it scroll-locked
+    return () => unlockScroll();
   }, []);
 
+  // idempotent — runs once whether via timeline completion or the safety timer
   const endIntro = () => {
+    if (endedRef.current) return;
+    endedRef.current = true;
     sessionStorage.setItem("grip93-intro", "1");
-    document.body.style.overflow = "";
-    const lenis = (window as unknown as { __lenis?: Lenis }).__lenis;
-    lenis?.start();
+    introRef.current.active = false;
+    unlockScroll();
     window.scrollTo(0, 0);
     setPhase("done");
   };
