@@ -5,9 +5,16 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-import ShopTyres from "@/components/ShopTyres";
+import Link from "next/link";
 import IntroSplash from "@/components/IntroSplash";
 import type { IntroState } from "@/components/TyreStage";
+import SiteNav from "@/components/market/SiteNav";
+import SiteFooter from "@/components/market/SiteFooter";
+import ListingCard from "@/components/market/ListingCard";
+import TrustStrip from "@/components/market/TrustStrip";
+import SizePicker from "@/components/market/SizePicker";
+import VehiclePicker from "@/components/market/VehiclePicker";
+import { LISTINGS } from "@/lib/data";
 
 const TyreStage = dynamic(() => import("@/components/TyreStage"), { ssr: false });
 
@@ -20,23 +27,23 @@ const FEATURES = [
   { t: "All-Weather", d: "Aqua-channel tread clears water fast and grips in heat, rain and cold — year-round.", i: "❉" },
 ];
 const RINGS = [
-  { t: "Grip", s: 96, d: "Dry & wet traction" },
-  { t: "Durability", s: 94, d: "Casing & build" },
-  { t: "Mileage", s: 92, d: "Tread life & wear" },
-  { t: "Safety", s: 97, d: "Braking & stability" },
+  { t: "Inspected", s: 98, d: "12-point safety check" },
+  { t: "Buyer Trust", s: 96, d: "Verified condition reports" },
+  { t: "Value", s: 94, d: "Up to 60% off new" },
+  { t: "On-time", s: 95, d: "Pan-India delivery" },
 ];
-const SPECS = [
-  ["Size", "225/45 R17"],
-  ["Load · Speed", "94W XL"],
-  ["Tread depth", "8.2 mm"],
-  ["Wet grade", "A"],
-  ["Warranty", "70,000 km"],
+const SPECS: [string, string][] = [
+  ["165/80 R14", "Hatchbacks"],
+  ["185/65 R15", "Sedans"],
+  ["195/55 R16", "Premium hatch"],
+  ["215/60 R17", "Compact SUV"],
+  ["235/65 R17", "Full-size SUV"],
 ];
 
 type Lenis = { stop: () => void; start: () => void };
 
 export default function Page() {
-  const [menu, setMenu] = useState(false);
+  const [tab, setTab] = useState<"size" | "vehicle">("size");
   const introRef = useRef<IntroState>({ active: false, t: 0, kick: 0 });
   const endedRef = useRef(false);
   const [phase, setPhase] = useState<"boot" | "intro" | "done">("boot");
@@ -125,35 +132,10 @@ export default function Page() {
         <div id="prog" className="w-full bg-gradient-to-b from-flame to-flame-light shadow-flame" style={{ height: 0 }} />
       </div>
 
-      {/* nav */}
-      <header className="fixed inset-x-0 top-0 z-50">
-        <div className="mx-auto mt-3 flex h-[60px] max-w-7xl items-center justify-between rounded-2xl glass px-5">
-          <a href="#home" className="flex items-center gap-2.5 font-display text-2xl font-extrabold">
-            <span className="grid h-8 w-8 place-items-center rounded-full border-[3px] border-flame shadow-flame">
-              <span className="h-2.5 w-2.5 rounded-full bg-white" />
-            </span>
-            GRIP <span className="text-flame">93</span>
-          </a>
-          <nav className="hidden gap-1 md:flex">
-            {["Features", "Shop", "Performance", "Specs"].map((x) => (
-              <a key={x} href={`#${x === "Shop" ? "shop" : x.toLowerCase()}`} className="rounded-lg px-3 py-2 text-sm text-white/60 transition hover:bg-white/5 hover:text-white">{x}</a>
-            ))}
-          </nav>
-          <div className="flex items-center gap-3">
-            <a href="#" className="rounded-lg bg-flame px-5 py-2.5 font-display text-sm font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Shop Now</a>
-            <button className="flex flex-col gap-1.5 p-2 md:hidden" onClick={() => setMenu((m) => !m)} aria-label="Menu">
-              <span className="h-0.5 w-6 bg-white" /><span className="h-0.5 w-6 bg-white" /><span className="h-0.5 w-6 bg-white" />
-            </button>
-          </div>
-        </div>
-        {menu && (
-          <div className="mx-4 mt-2 rounded-xl glass p-2 md:hidden">
-            {["Features", "Shop", "Performance", "Specs"].map((x) => (
-              <a key={x} href={`#${x === "Shop" ? "shop" : x.toLowerCase()}`} onClick={() => setMenu(false)} className="block rounded-lg px-4 py-3 text-white/70">{x}</a>
-            ))}
-          </div>
-        )}
-      </header>
+      {/* shared marketplace nav */}
+      <div className="fixed inset-x-0 top-0 z-50 px-4 md:px-6">
+        <SiteNav />
+      </div>
 
       <main className="relative z-20">
         {/* CHOREOGRAPHY RANGE — the pinned 3D tyre travels & spins across these screens */}
@@ -165,18 +147,28 @@ export default function Page() {
             style={{ opacity: phase === "done" ? 1 : 0, transition: "opacity .8s ease" }}
           >
             <div>
-              <div className="font-display text-xs font-bold uppercase tracking-[0.4em] text-flame">Performance Tyre Co. · Est. 1993</div>
+              <div className="font-display text-xs font-bold uppercase tracking-[0.4em] text-flame">Certified Used Tyres · Pan-India</div>
               <h1 className="font-display mt-3 text-[clamp(3rem,13vw,10rem)] font-extrabold leading-[0.82] text-glow">
                 GRIP <span className="flame-text">93</span>
               </h1>
             </div>
-            <div>
-              <div className="font-display text-[clamp(1rem,2.4vw,1.6rem)] font-medium uppercase tracking-[0.18em] text-white/90">One Tyre. Every Journey.</div>
-              <div className="mt-6 flex flex-wrap justify-center gap-3.5">
-                <a href="#shop" className="rounded-lg bg-flame px-7 py-3.5 font-display font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Shop Tyres →</a>
-                <a href="#features" className="rounded-lg border border-white/20 px-7 py-3.5 font-display font-bold uppercase tracking-wide text-white transition hover:border-flame hover:text-flame">Features</a>
+            <div className="w-full max-w-2xl">
+              <div className="font-display text-[clamp(0.95rem,2.2vw,1.4rem)] font-medium uppercase tracking-[0.16em] text-white/90">Inspected. Graded. Delivered.</div>
+
+              {/* search card */}
+              <div className="mt-5 rounded-2xl glass p-4 text-left">
+                <div className="mb-3 flex gap-2">
+                  <button onClick={() => setTab("size")} className={`rounded-lg px-4 py-2 font-display text-sm font-bold uppercase tracking-wide transition ${tab === "size" ? "bg-flame text-[#120a04]" : "text-white/70 hover:text-white"}`}>By size</button>
+                  <button onClick={() => setTab("vehicle")} className={`rounded-lg px-4 py-2 font-display text-sm font-bold uppercase tracking-wide transition ${tab === "vehicle" ? "bg-flame text-[#120a04]" : "text-white/70 hover:text-white"}`}>By vehicle</button>
+                </div>
+                {tab === "size" ? <SizePicker /> : <VehiclePicker />}
               </div>
-              <div className="mt-8 font-display text-[10px] uppercase tracking-[0.3em] text-white/40">Scroll to spin ↓</div>
+
+              <div className="mt-4 flex flex-wrap justify-center gap-3.5">
+                <Link href="/shop" className="rounded-lg bg-flame px-7 py-3.5 font-display font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Browse all tyres →</Link>
+                <Link href="/sell" className="rounded-lg border border-white/20 px-7 py-3.5 font-display font-bold uppercase tracking-wide text-white transition hover:border-flame hover:text-flame">Sell your tyres</Link>
+              </div>
+              <div className="mt-6 font-display text-[10px] uppercase tracking-[0.3em] text-white/40">Scroll to explore ↓</div>
             </div>
           </section>
 
@@ -207,15 +199,40 @@ export default function Page() {
           </section>
         </div>
 
-        {/* SHOP TYRES — looping flip cards (rotation has ended; tyre canvas fades out) */}
-        <ShopTyres />
+        {/* TRUST STRIP */}
+        <section className="relative z-20 mx-auto max-w-7xl px-6 pt-8">
+          <TrustStrip />
+        </section>
+
+        {/* POPULAR USED TYRES */}
+        <section id="shop" className="relative z-20 mx-auto max-w-7xl px-6 py-20">
+          <div className="reveal mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <div className="font-display text-sm font-bold uppercase tracking-[0.26em] text-flame">In stock now</div>
+              <h2 className="font-display mt-2 text-4xl font-extrabold md:text-5xl">Popular used tyres</h2>
+            </div>
+            <Link href="/shop" className="rounded-lg border border-white/20 px-5 py-2.5 font-display text-sm font-bold uppercase tracking-wide text-white transition hover:border-flame hover:text-flame">View all →</Link>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {LISTINGS.slice(0, 8).map((l) => <ListingCard key={l.id} listing={l} />)}
+          </div>
+        </section>
+
+        {/* SELL BANNER */}
+        <section className="relative z-20 mx-auto max-w-7xl px-6 py-10">
+          <div className="reveal overflow-hidden rounded-3xl glass p-8 text-center md:p-12" style={{ background: "radial-gradient(circle at 50% 120%, rgba(255,106,26,0.18), transparent 60%)" }}>
+            <h2 className="font-display text-3xl font-extrabold md:text-5xl">Got old tyres? Turn them into cash.</h2>
+            <p className="mx-auto mt-3 max-w-xl text-white/60">Tell us the size and condition, upload a few photos, and get an instant quote with free doorstep pickup.</p>
+            <Link href="/sell" className="mt-6 inline-flex rounded-lg bg-flame px-8 py-4 font-display font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Get a quote →</Link>
+          </div>
+        </section>
 
         {/* PERFORMANCE */}
         <section id="performance" className="relative z-20 mx-auto max-w-7xl px-6 py-28">
           <div className="reveal mx-auto mb-14 max-w-2xl text-center">
-            <div className="font-display text-sm font-bold uppercase tracking-[0.26em] text-flame">Tested · Rated · Proven</div>
-            <h2 className="font-display mt-3 text-4xl font-extrabold md:text-5xl">Performance Ratings</h2>
-            <p className="mt-3 text-white/60">Independently scored across the metrics that define a great tyre.</p>
+            <div className="font-display text-sm font-bold uppercase tracking-[0.26em] text-flame">Why GRIP 93</div>
+            <h2 className="font-display mt-3 text-4xl font-extrabold md:text-5xl">Buy used with confidence</h2>
+            <p className="mt-3 text-white/60">Every tyre inspected, graded and backed by a 7-day warranty.</p>
           </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {RINGS.map((r) => (
@@ -234,37 +251,36 @@ export default function Page() {
           </div>
         </section>
 
-        {/* SPECS */}
+        {/* POPULAR SIZES */}
         <section id="specs" className="relative z-20 mx-auto max-w-3xl px-6 py-20">
           <div className="reveal mb-10 text-center">
-            <div className="font-display text-sm font-bold uppercase tracking-[0.26em] text-flame">The Numbers</div>
-            <h2 className="font-display mt-3 text-4xl font-extrabold md:text-5xl">Specifications</h2>
+            <div className="font-display text-sm font-bold uppercase tracking-[0.26em] text-flame">Fast movers</div>
+            <h2 className="font-display mt-3 text-4xl font-extrabold md:text-5xl">Popular sizes in stock</h2>
           </div>
           <div className="reveal overflow-hidden rounded-2xl glass">
-            {SPECS.map(([k, v], i) => (
-              <div key={k} className={`flex items-center justify-between px-6 py-5 ${i ? "border-t hairline" : ""}`}>
-                <span className="text-white/55">{k}</span>
-                <span className="font-display text-lg font-bold text-white">{v}</span>
-              </div>
-            ))}
+            {SPECS.map(([size, use], i) => {
+              const [w, rest] = size.split("/");
+              const [a, r] = rest.split(" R");
+              return (
+                <Link key={size} href={`/shop?width=${w}&aspect=${a}&rim=${r}`} className={`flex items-center justify-between px-6 py-5 transition hover:bg-white/5 ${i ? "border-t hairline" : ""}`}>
+                  <span className="font-display text-lg font-bold text-white">{size}</span>
+                  <span className="text-white/55">{use} <span className="text-flame">→</span></span>
+                </Link>
+              );
+            })}
           </div>
         </section>
 
         {/* CTA */}
         <section className="relative z-20 overflow-hidden px-6 py-32 text-center">
           <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(circle at 50% 120%, rgba(255,106,26,0.28), transparent 60%)" }} />
-          <h2 className="reveal font-display relative text-[clamp(2.6rem,8vw,6rem)] font-extrabold text-glow">One Tyre. Every Journey.</h2>
-          <p className="reveal relative mx-auto mt-4 max-w-xl text-white/60">Join thousands of drivers who trust GRIP 93 for confidence in every corner.</p>
-          <a href="#" className="reveal relative mt-8 inline-flex rounded-lg bg-flame px-8 py-4 font-display font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Shop GRIP 93 →</a>
+          <h2 className="reveal font-display relative text-[clamp(2.4rem,7vw,5.5rem)] font-extrabold text-glow">Find your tyre. Pay less.<br />Drive safe.</h2>
+          <p className="reveal relative mx-auto mt-4 max-w-xl text-white/60">Thousands of inspected second-hand tyres across India — graded, warrantied and delivered to your door.</p>
+          <Link href="/shop" className="reveal relative mt-8 inline-flex rounded-lg bg-flame px-8 py-4 font-display font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Browse tyres →</Link>
         </section>
       </main>
 
-      <footer className="relative z-20 border-t hairline bg-ink-800/80 px-6 py-12">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-sm text-white/40 md:flex-row">
-          <span>© 2026 GRIP 93 Performance Tyre Co.</span>
-          <span className="font-display uppercase tracking-widest">One Tyre. Every Journey.</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }
