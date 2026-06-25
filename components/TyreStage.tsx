@@ -14,10 +14,15 @@ gsap.registerPlugin(ScrollTrigger);
 // yaw 0 = tread-forward, yaw ~0.85 = 3/4 (01_33_07), yaw π/2 = GRIP 93 sidewall (01_46_00).
 const HALF_PI = Math.PI / 2;
 const TURNS = 3; // whole turns of axle-roll across the scroll → lands upright on the sidewall
+// side = horizontal offset (-1 left .. +1 right) on desktop; up = vertical offset (0..1) on phone.
+// The tyre slides OPPOSITE the section text so it's never covered: Features text is on the left →
+// tyre right; Journey text is on the right → tyre left. On phone it rides UP (text card sits below).
 const KEYS = [
-  { p: 0.0, yaw: 0.34, tilt: -0.22, s: 1.0 }, // tread-forward 3/4
-  { p: 0.5, yaw: 0.85, tilt: -0.13, s: 1.0 }, // 3/4 hero
-  { p: 1.0, yaw: HALF_PI, tilt: -0.05, s: 1.06 }, // GRIP 93 sidewall
+  { p: 0.0, yaw: 0.34, tilt: -0.22, s: 1.0, side: 0, up: 0 }, // hero — centered
+  { p: 0.22, yaw: 0.55, tilt: -0.18, s: 1.0, side: 0, up: 0 }, // hero settle
+  { p: 0.45, yaw: 0.9, tilt: -0.14, s: 0.9, side: 1, up: 1 }, // Features — tyre right / up
+  { p: 0.78, yaw: 1.3, tilt: -0.08, s: 0.9, side: -1, up: 1 }, // Journey — tyre left / up
+  { p: 1.0, yaw: HALF_PI, tilt: -0.05, s: 1.0, side: -1, up: 1 }, // sidewall + handoff
 ];
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -27,7 +32,10 @@ function sample(p: number) {
     const a = KEYS[i], b = KEYS[i + 1];
     if (p <= b.p) {
       const t = smooth((p - a.p) / (b.p - a.p));
-      return { yaw: lerp(a.yaw, b.yaw, t), tilt: lerp(a.tilt, b.tilt, t), s: lerp(a.s, b.s, t) };
+      return {
+        yaw: lerp(a.yaw, b.yaw, t), tilt: lerp(a.tilt, b.tilt, t), s: lerp(a.s, b.s, t),
+        side: lerp(a.side, b.side, t), up: lerp(a.up, b.up, t),
+      };
     }
   }
   return KEYS[KEYS.length - 1];
@@ -90,7 +98,16 @@ function Rig({
     // SCROLL-LOCKED: everything read directly from progress — no autonomous drift, no lag.
     const p = Math.max(0, Math.min(1, progress.current));
     const t = sample(p);
-    g.position.set(0, 0, 0); // centered & pinned
+    // slide the tyre OPPOSITE the section text so it's never covered:
+    // landscape → horizontal (left/right); portrait (phone) → up (text card sits below).
+    const aspect = size.width / size.height;
+    const portrait = aspect < 1;
+    const hfov = 2 * Math.atan(Math.tan(VFOV / 2) * aspect);
+    const halfW = Math.tan(hfov / 2) * fz;
+    const halfH = Math.tan(VFOV / 2) * fz;
+    const ox = portrait ? 0 : t.side * halfW * 0.42;
+    const oy = portrait ? t.up * halfH * 0.4 : 0;
+    g.position.set(ox, oy, 0);
     g.rotation.x = t.tilt;
     g.scale.setScalar(t.s);
     y.rotation.y = t.yaw; // turntable reveal (which face)

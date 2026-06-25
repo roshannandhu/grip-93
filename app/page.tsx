@@ -8,6 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ShopTyres from "@/components/ShopTyres";
 import IntroSplash from "@/components/IntroSplash";
 import type { IntroState } from "@/components/TyreStage";
+import { useMarket } from "@/lib/store";
 
 const TyreStage = dynamic(() => import("@/components/TyreStage"), { ssr: false });
 
@@ -37,6 +38,7 @@ type Lenis = { stop: () => void; start: () => void };
 
 export default function Page() {
   const [menu, setMenu] = useState(false);
+  const { cartCount, openCart } = useMarket();
   const introRef = useRef<IntroState>({ active: false, t: 0, kick: 0 });
   const endedRef = useRef(false);
   const [phase, setPhase] = useState<"boot" | "intro" | "reveal" | "done">("boot");
@@ -136,13 +138,27 @@ export default function Page() {
             </span>
             GRIP <span className="text-flame">93</span>
           </a>
-          <nav className="hidden gap-1 md:flex">
-            {["Features", "Shop", "Performance", "Specs"].map((x) => (
-              <a key={x} href={x === "Shop" ? "/shop" : `#${x.toLowerCase()}`} className="rounded-lg px-3 py-2 text-sm text-white/60 transition hover:bg-white/5 hover:text-white">{x}</a>
+          <nav className="hidden items-center gap-1 md:flex">
+            {[["Shop", "/shop"], ["About Us", "/about"], ["Contact Us", "/contact"], ["Compare", "/compare"]].map(([label, href]) => (
+              <a key={href} href={href} className="rounded-lg px-3 py-2 text-sm text-white/60 transition hover:bg-white/5 hover:text-white">{label}</a>
             ))}
+            <div className="group relative">
+              <button className="rounded-lg px-3 py-2 text-sm text-white/60 transition hover:bg-white/5 hover:text-white">Account ▾</button>
+              <div className="invisible absolute right-0 top-full pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100">
+                <div className="w-44 rounded-xl glass p-2">
+                  {[["Dashboard", "/account"], ["Orders", "/account/orders"], ["Warranty", "/account/warranty"], ["Wishlist", "/wishlist"]].map(([label, href]) => (
+                    <a key={href} href={href} className="block rounded-lg px-3 py-2 text-sm text-white/70 transition hover:bg-white/5 hover:text-flame">{label}</a>
+                  ))}
+                </div>
+              </div>
+            </div>
           </nav>
-          <div className="flex items-center gap-3">
-            <a href="/shop" className="rounded-lg bg-flame px-5 py-2.5 font-display text-sm font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Shop Now</a>
+          <div className="flex items-center gap-2">
+            <button onClick={openCart} className="relative grid h-9 w-9 place-items-center rounded-lg text-white/70 transition hover:bg-white/5 hover:text-flame" aria-label="Cart">
+              🛒
+              {cartCount > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-flame px-1 text-[10px] font-bold text-[#120a04]">{cartCount}</span>}
+            </button>
+            <a href="/shop" className="hidden rounded-lg bg-flame px-5 py-2.5 font-display text-sm font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light sm:block">Shop Now</a>
             <button className="flex flex-col gap-1.5 p-2 md:hidden" onClick={() => setMenu((m) => !m)} aria-label="Menu">
               <span className="h-0.5 w-6 bg-white" /><span className="h-0.5 w-6 bg-white" /><span className="h-0.5 w-6 bg-white" />
             </button>
@@ -150,8 +166,8 @@ export default function Page() {
         </div>
         {menu && (
           <div className="mx-4 mt-2 rounded-xl glass p-2 md:hidden">
-            {["Features", "Shop", "Performance", "Specs"].map((x) => (
-              <a key={x} href={x === "Shop" ? "/shop" : `#${x.toLowerCase()}`} onClick={() => setMenu(false)} className="block rounded-lg px-4 py-3 text-white/70">{x}</a>
+            {[["Shop", "/shop"], ["About Us", "/about"], ["Contact Us", "/contact"], ["Compare", "/compare"], ["Dashboard", "/account"], ["Orders", "/account/orders"], ["Warranty", "/account/warranty"], ["Wishlist", "/wishlist"]].map(([label, href]) => (
+              <a key={href} href={href} onClick={() => setMenu(false)} className="block rounded-lg px-4 py-3 text-white/70">{label}</a>
             ))}
           </div>
         )}
@@ -182,26 +198,26 @@ export default function Page() {
             </div>
           </section>
 
-          {/* FEATURES — tyre slides right, cards on the left */}
-          <section id="features" className="relative flex min-h-screen items-center px-6">
-            <div className="w-full max-w-xl md:w-[52%]">
+          {/* FEATURES — desktop: tyre slides right, cards left · phone: tyre up, cards in bottom glass */}
+          <section id="features" className="relative flex min-h-screen items-end px-4 pb-[7vh] md:items-center md:px-6 md:pb-0">
+            <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-ink-800/55 p-5 backdrop-blur md:w-[52%] md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-0">
               <div className="reveal font-display text-sm font-bold uppercase tracking-[0.26em] text-flame">Engineering</div>
-              <h2 className="reveal font-display mt-3 text-4xl font-extrabold md:text-5xl">Built To Perform</h2>
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <h2 className="reveal font-display mt-2 text-3xl font-extrabold md:mt-3 md:text-5xl">Built To Perform</h2>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 md:mt-8 md:gap-4">
                 {FEATURES.map((f) => (
-                  <div key={f.t} className="reveal rounded-2xl glass p-6 transition">
-                    <div className="font-display text-2xl text-flame">{f.i}</div>
-                    <h3 className="font-display mt-3 text-xl font-bold">{f.t}</h3>
-                    <p className="mt-2 text-sm text-white/60">{f.d}</p>
+                  <div key={f.t} className="reveal rounded-2xl glass p-4 transition md:p-6">
+                    <div className="font-display text-xl text-flame md:text-2xl">{f.i}</div>
+                    <h3 className="font-display mt-2 text-lg font-bold md:mt-3 md:text-xl">{f.t}</h3>
+                    <p className="mt-1.5 text-xs text-white/60 md:mt-2 md:text-sm">{f.d}</p>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          {/* JOURNEY — copy on the right (glass for legibility over the tyre) */}
-          <section className="relative flex min-h-screen items-center justify-end px-6">
-            <div className="reveal w-full max-w-md rounded-3xl glass p-7 text-right md:w-[44%]">
+          {/* JOURNEY — desktop: copy right · phone: tyre up, copy in bottom glass card */}
+          <section className="relative flex min-h-screen items-end justify-end px-4 pb-[7vh] md:items-center md:px-6 md:pb-0">
+            <div className="reveal w-full max-w-md rounded-3xl glass p-5 text-right md:w-[44%] md:p-7">
               <div className="font-display text-sm font-bold uppercase tracking-[0.26em] text-flame">The Journey</div>
               <h2 className="font-display mt-2 text-3xl font-extrabold md:text-5xl">Built For Every Machine</h2>
               <p className="mt-4 text-white/65">From race-bred sports cars to loaded SUVs and lean-confident motorcycles — one compound, engineered to grip every road, in every season.</p>

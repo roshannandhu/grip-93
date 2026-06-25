@@ -9,7 +9,7 @@ import TyreImage from "./TyreImage";
 import GradeBadge from "./GradeBadge";
 
 export default function QuickView({ listing, onClose }: { listing: Listing | null; onClose: () => void }) {
-  const { addToCart } = useMarket();
+  const { addToCart, openCart } = useMarket();
 
   useEffect(() => {
     if (!listing) return;
@@ -69,7 +69,7 @@ export default function QuickView({ listing, onClose }: { listing: Listing | nul
               <div className="font-display text-2xl font-extrabold">{formatINR(listing.priceINR)} <span className="text-xs font-normal text-white/40">+ GST</span></div>
               <div className="mt-3 flex gap-2">
                 <button
-                  onClick={() => { addToCart(listing.id); onClose(); }}
+                  onClick={() => { addToCart(listing.id); onClose(); openCart(); }}
                   className="flex-1 rounded-lg bg-flame px-4 py-2.5 font-display text-xs font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light"
                 >
                   Add to cart

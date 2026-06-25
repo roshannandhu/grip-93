@@ -22,6 +22,9 @@ type Ctx = State & {
   addOrder: (o: Order) => void;
   cartCount: number;
   ready: boolean;
+  cartOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
 };
 
 const KEY = "grip93-market";
@@ -32,6 +35,7 @@ const empty: State = { cart: [], wishlist: [], compare: [], orders: [] };
 export function MarketProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<State>(empty);
   const [ready, setReady] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const first = useRef(true);
 
   // hydrate from localStorage once (after mount → no SSR mismatch)
@@ -61,6 +65,9 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
     return {
       ...state,
       ready,
+      cartOpen,
+      openCart: () => setCartOpen(true),
+      closeCart: () => setCartOpen(false),
       cartCount: state.cart.reduce((n, i) => n + i.qty, 0),
       addToCart: (id, qty = 1) =>
         up((s) => {
@@ -89,7 +96,7 @@ export function MarketProvider({ children }: { children: React.ReactNode }) {
       inCompare: (id) => state.compare.includes(id),
       addOrder: (o) => up((s) => ({ ...s, orders: [o, ...s.orders], cart: [] })),
     };
-  }, [state, ready]);
+  }, [state, ready, cartOpen]);
 
   return <MarketContext.Provider value={api}>{children}</MarketContext.Provider>;
 }

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import MarketShell from "@/components/market/MarketShell";
 import ConditionReport from "@/components/market/ConditionReport";
 import ListingCard from "@/components/market/ListingCard";
+import Reveal from "@/components/market/Reveal";
 import { getListing, relatedListings, LISTINGS } from "@/lib/data";
 import Gallery from "./Gallery";
 import BuyBox from "./BuyBox";
@@ -29,17 +30,19 @@ export default function TyrePage({ params }: { params: { id: string } }) {
 
       <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
-          <Gallery listing={listing} />
-          <ConditionReport listing={listing} />
+          <Reveal><Gallery listing={listing} /></Reveal>
+          <Reveal delay={0.12}><ConditionReport listing={listing} /></Reveal>
         </div>
 
         <div className="space-y-5">
-          <div>
-            <h1 className="font-display text-3xl font-extrabold md:text-4xl">{listing.brand} {listing.model}</h1>
-            <div className="mt-1 font-display text-lg text-flame">{listing.sizeLabel} · {listing.loadIndex}{listing.speedRating} · <span className="capitalize">{listing.vehicleType}</span></div>
-            <div className="mt-1 text-sm text-white/45">📍 {listing.city} · Sold by {listing.sellerType}</div>
-          </div>
-          <BuyBox listing={listing} />
+          <Reveal delay={0.06}>
+            <div>
+              <h1 className="font-display text-3xl font-extrabold md:text-4xl">{listing.brand} {listing.model}</h1>
+              <div className="mt-1 font-display text-lg text-flame">{listing.sizeLabel} · {listing.loadIndex}{listing.speedRating} · <span className="capitalize">{listing.vehicleType}</span></div>
+              <div className="mt-1 text-sm text-white/45">📍 {listing.city} · Sold by {listing.sellerType}</div>
+            </div>
+          </Reveal>
+          <Reveal delay={0.14}><BuyBox listing={listing} /></Reveal>
         </div>
       </div>
 
@@ -47,7 +50,11 @@ export default function TyrePage({ params }: { params: { id: string } }) {
         <section className="mt-16">
           <h2 className="font-display mb-5 text-2xl font-extrabold">Similar tyres</h2>
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {related.map((l) => <ListingCard key={l.id} listing={l} />)}
+            {related.map((l, idx) => (
+              <Reveal key={l.id} delay={Math.min(idx, 6) * 0.05}>
+                <ListingCard listing={l} />
+              </Reveal>
+            ))}
           </div>
         </section>
       )}

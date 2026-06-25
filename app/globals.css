@@ -61,6 +61,9 @@ html.lenis, html.lenis body { height: auto; }
   mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 75%);
 }
 .hairline { border-color: rgba(255,255,255,0.08); }
+
+/* native select dropdown: OS option popup is light → force readable dark option rows */
+select option { background-color: #14141a; color: #f5f5f6; }
 @keyframes floaty { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
 .floaty { animation: floaty 4s ease-in-out infinite; }
 

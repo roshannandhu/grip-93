@@ -3,6 +3,7 @@ import { Inter, Saira_Condensed } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import { MarketProvider } from "@/lib/store";
+import CartDrawer from "@/components/market/CartDrawer";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const saira = Saira_Condensed({
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-ink text-white font-sans antialiased" suppressHydrationWarning>
         <MarketProvider>
           <SmoothScroll>{children}</SmoothScroll>
+          <CartDrawer />
         </MarketProvider>
       </body>
     </html>

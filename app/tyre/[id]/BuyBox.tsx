@@ -8,7 +8,7 @@ import { useMarket } from "@/lib/store";
 
 export default function BuyBox({ listing }: { listing: Listing }) {
   const router = useRouter();
-  const { addToCart, toggleWishlist, inWishlist, toggleCompare, inCompare } = useMarket();
+  const { addToCart, openCart, toggleWishlist, inWishlist, toggleCompare, inCompare } = useMarket();
   const [qty, setQty] = useState(1);
   const [pin, setPin] = useState("");
   const wished = inWishlist(listing.id);
@@ -64,7 +64,7 @@ export default function BuyBox({ listing }: { listing: Listing }) {
           Buy now →
         </button>
         <button
-          onClick={() => addToCart(listing.id, qty)}
+          onClick={() => { addToCart(listing.id, qty); openCart(); }}
           className="rounded-lg border border-white/20 px-6 py-3 font-display font-bold uppercase tracking-wide text-white transition hover:border-flame hover:text-flame"
         >
           Add to cart

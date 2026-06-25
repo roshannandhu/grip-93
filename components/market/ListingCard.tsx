@@ -15,7 +15,7 @@ export default function ListingCard({
   onQuickView?: (l: Listing) => void;
 }) {
   const router = useRouter();
-  const { addToCart, toggleWishlist, inWishlist, toggleCompare, inCompare } = useMarket();
+  const { addToCart, openCart, toggleWishlist, inWishlist, toggleCompare, inCompare } = useMarket();
   const wished = inWishlist(listing.id);
   const compared = inCompare(listing.id);
   const href = `/tyre/${listing.id}`;
@@ -88,7 +88,7 @@ export default function ListingCard({
 
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button
-              onClick={(e) => { stop(e); addToCart(listing.id); }}
+              onClick={(e) => { stop(e); addToCart(listing.id); openCart(); }}
               className="rounded-lg border border-white/20 px-3 py-2.5 font-display text-xs font-bold uppercase tracking-wide text-white transition hover:border-flame hover:text-flame"
             >
               Add to cart
