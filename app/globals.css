@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --flame: #ff6a1a;
+  --flame-light: #ff8b3d;
+}
+
+html {
+  background: #070708;
+  color: #f5f5f6;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  background: #070708;
+  overflow-x: hidden;
+}
+
+/* Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+::selection { background: var(--flame); color: #120a04; }
+
+/* display headings */
+.font-display { font-style: italic; text-transform: uppercase; letter-spacing: 0.01em; line-height: 0.9; }
+
+/* fade-up reveal target (driven by GSAP) */
+.reveal { opacity: 0; transform: translateY(34px); }
+
+/* thin scrollbar */
+::-webkit-scrollbar { width: 0px; }
+
+/* vehicle silhouette strokes */
+.veh-body { fill: #15161b; stroke: rgba(255,255,255,0.14); stroke-width: 2; }
+.veh-acc { fill: none; stroke: var(--flame); stroke-width: 2.5; }
+.veh-glass { fill: rgba(255,106,26,0.12); }
+
+/* grain / vignette */
+.vignette { background: radial-gradient(ellipse 80% 80% at 50% 40%, transparent 55%, rgba(0,0,0,0.7)); }
+
+/* ---- dark-modern system ---- */
+.glass {
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(14px);
+}
+.glass:hover { border-color: rgba(255,106,26,0.35); }
+.text-glow { text-shadow: 0 0 40px rgba(255,106,26,0.35); }
+.flame-text {
+  background: linear-gradient(180deg, #ffb27a, #ff6a1a 60%, #d8500a);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.grid-overlay {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 75%);
+}
+.hairline { border-color: rgba(255,255,255,0.08); }
+@keyframes floaty { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+.floaty { animation: floaty 4s ease-in-out infinite; }
+
+/* ---- cinematic intro splash ---- */
+.smoke-puff {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 9999px;
+  /* layered off-centre gradients → irregular, cloud-like density instead of a flat disc */
+  background:
+    radial-gradient(circle at 38% 38%, rgba(228,228,233,0.55), rgba(228,228,233,0) 58%),
+    radial-gradient(circle at 66% 58%, rgba(188,188,198,0.45), rgba(188,188,198,0) 60%),
+    radial-gradient(circle at 50% 70%, rgba(150,150,162,0.38), rgba(150,150,162,0) 68%);
+  filter: blur(14px);
+  mix-blend-mode: screen; /* overlapping puffs accumulate into volume, like real smoke */
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+.shock-ring {
+  position: absolute;
+  border-radius: 9999px;
+  border: 3px solid rgba(255,139,61,0.85);
+  box-shadow: 0 0 50px rgba(255,106,26,0.55), inset 0 0 30px rgba(255,106,26,0.35);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+/* ---- 3D flip cards ---- */
+.card-3d { perspective: 1400px; }
+.card-inner { transform-style: preserve-3d; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+.card-inner.is-flipped { transform: rotateY(180deg); }
+.card-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.card-back { transform: rotateY(180deg); }

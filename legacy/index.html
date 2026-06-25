@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GRIP 93 — One Tyre. Every Journey.</title>
+<meta name="description" content="GRIP 93 — premium performance tyres. One tyre, every journey. Strong grip, long life, all-weather safety." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:ital,wght@0,500;0,700;0,800;1,700;1,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070708; --bg-2:#0d0d10; --panel:#141418; --panel-2:#1a1b20;
+    --ink:#f5f5f6; --muted:#9b9ba4; --muted-2:#6d6d76;
+    --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.16);
+    --orange:#ff6a1a; --orange-2:#ff8b3d; --glow:rgba(255,106,26,.55);
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  .disp{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;font-style:italic;letter-spacing:.01em;line-height:.9}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+  .orange{color:var(--orange)}
+
+  .btn{display:inline-flex;align-items:center;gap:10px;font-family:'Saira Condensed';font-weight:700;font-style:italic;text-transform:uppercase;letter-spacing:.04em;font-size:1.05rem;padding:15px 30px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:.25s var(--ease)}
+  .btn svg{width:18px;height:18px}
+  .btn-orange{background:var(--orange);color:#120a04;box-shadow:0 10px 34px -8px var(--glow)}
+  .btn-orange:hover{background:var(--orange-2);transform:translateY(-2px);box-shadow:0 16px 44px -10px var(--glow)}
+  .btn-line{border-color:var(--line-2);color:var(--ink)}
+  .btn-line:hover{border-color:var(--orange);color:var(--orange)}
+
+  /* ---------- NAV ---------- */
+  header{position:fixed;inset:0 0 auto 0;z-index:60;transition:.3s var(--ease)}
+  header.scrolled{background:rgba(7,7,8,.7);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Saira Condensed';font-style:italic;font-weight:800;font-size:1.7rem;letter-spacing:.01em}
+  .brand .mk{width:34px;height:34px;border-radius:50%;border:3px solid var(--orange);position:relative;display:grid;place-items:center;box-shadow:0 0 16px -2px var(--glow)}
+  .brand .mk::before{content:"";width:11px;height:11px;border-radius:50%;background:var(--ink)}
+  .brand b{color:var(--orange);font-weight:800}
+  .nav-links{display:flex;gap:4px}
+  .nav-links a{font-size:.9rem;font-weight:500;color:var(--muted);padding:9px 14px;border-radius:8px;transition:.2s}
+  .nav-links a:hover{color:var(--ink);background:rgba(255,255,255,.05)}
+  .burger{display:none;flex-direction:column;gap:5px;background:none;border:0;cursor:pointer;padding:8px}
+  .burger span{width:24px;height:2px;background:var(--ink);transition:.3s}
+
+  /* ---------- 360 TYRE COMPONENT ---------- */
+  .tyre360{position:relative;width:100%;height:100%;display:grid;place-items:center}
+  .tyre360 .fb{position:absolute;width:78%;max-width:520px;aspect-ratio:1/1;border-radius:50%;
+    background:repeating-conic-gradient(#1a1a1f 0 6deg,#0c0c0f 6deg 12deg);
+    border:min(8vw,52px) solid #0e0e11;box-shadow:inset 0 0 70px #000,0 40px 80px -30px #000;
+    display:grid;place-items:center;animation:spin 16s linear infinite}
+  .tyre360 .fb::after{content:"";width:42%;height:42%;border-radius:50%;background:conic-gradient(#3a3b42,#16171b,#3a3b42,#202126,#3a3b42)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .tyre360 .frame{position:absolute;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .05s linear}
+  .tyre360.has-frames .fb{display:none}
+  .tyre360 .frame.on{opacity:1}
+
+  /* ---------- STAGE / SCROLL JOURNEY ---------- */
+  .stage{position:relative;height:460vh}
+  .sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+  .sticky .glow{position:absolute;border-radius:50%;filter:blur(120px);opacity:.4;pointer-events:none}
+  .glow.o{width:680px;height:680px;background:var(--orange);left:50%;top:50%;transform:translate(-50%,-50%);opacity:.18}
+  .grain{position:absolute;inset:0;background-image:radial-gradient(circle at 50% 50%,transparent 60%,rgba(0,0,0,.55));pointer-events:none}
+
+  /* the travelling tyre — position/scale driven continuously by JS */
+  .travel{position:absolute;top:53%;left:50%;width:min(46vw,400px);height:min(46vw,400px);z-index:3;
+    transform:translate(-50%,-50%);will-change:transform}
+  #heroTyre{opacity:0}
+  body.ready #heroTyre{animation:emerge 1.4s var(--ease) forwards}
+
+  /* hero text — wordmark above tyre, tagline + cta below */
+  .hero-text{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:calc(74px + 3vh) 16px 8vh;pointer-events:none;transition:opacity .6s,filter .6s}
+  .hero-text .cta a{pointer-events:auto}
+  .stage.journey .hero-text{opacity:0;filter:blur(6px)}
+  .hero-text .kick{font-family:'Saira Condensed';font-style:italic;font-weight:700;letter-spacing:.34em;font-size:.8rem;color:var(--orange);opacity:0;transform:translateY(14px)}
+  .hero-text h1{font-size:clamp(2.4rem,7.5vw,6rem);font-weight:800;margin-top:4px;opacity:0;transform:translateY(26px) scale(.96);text-shadow:0 6px 50px rgba(0,0,0,.7)}
+  .hero-text h1 b{color:var(--orange);font-weight:800}
+  .hero-text .tag{font-family:'Saira Condensed';font-style:italic;font-weight:500;text-transform:uppercase;letter-spacing:.14em;font-size:clamp(1.1rem,2.6vw,1.8rem);color:var(--ink);opacity:0;transform:translateY(16px)}
+  .hero-text .cta{margin-top:22px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;opacity:0;transform:translateY(16px)}
+  body.ready .hero-text .kick{animation:rise .8s var(--ease) .2s forwards}
+  body.ready .hero-text h1{animation:rise .9s var(--ease) .6s forwards}
+  body.ready .hero-text .tag{animation:rise .8s var(--ease) 1.15s forwards}
+  body.ready .hero-text .cta{animation:rise .8s var(--ease) 1.55s forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  @keyframes emerge{0%{opacity:0;transform:scale(.82)}100%{opacity:1;transform:scale(1)}}
+
+  .scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:5;font-family:'Saira Condensed';font-style:italic;text-transform:uppercase;letter-spacing:.2em;font-size:.72rem;color:var(--muted-2);display:flex;flex-direction:column;align-items:center;gap:8px;transition:opacity .4s}
+  .stage.journey .scroll-hint{opacity:0}
+  .scroll-hint .ln{width:1px;height:34px;background:linear-gradient(var(--orange),transparent);animation:drop 1.6s ease-in-out infinite}
+  @keyframes drop{0%,100%{transform:scaleY(.4);opacity:.4}50%{transform:scaleY(1);opacity:1}}
+
+  /* vehicle silhouettes */
+  .vehicle{position:absolute;top:50%;transform:translateY(-50%);width:min(40vw,520px);opacity:0;transition:opacity .2s linear;z-index:2}
+  .vehicle svg{width:100%;height:auto;filter:drop-shadow(0 30px 40px rgba(0,0,0,.6))}
+  .vehicle .body{fill:#16171c;stroke:var(--line-2);stroke-width:2}
+  .vehicle .accent{fill:none;stroke:var(--orange);stroke-width:2.5}
+  .vehicle .glass{fill:rgba(255,106,26,.12)}
+  .veh-car{left:6vw}
+  .veh-suv{right:6vw}
+  .veh-moto{left:8vw;width:min(34vw,420px)}
+
+  /* journey caption */
+  .caption{position:absolute;left:50%;bottom:11vh;transform:translateX(-50%);text-align:center;z-index:4;opacity:0;width:min(90vw,640px);pointer-events:none}
+  /* scroll progress bar */
+  .progress{position:fixed;top:0;right:0;width:3px;height:100vh;background:rgba(255,255,255,.06);z-index:55}
+  .progress span{display:block;width:100%;height:0;background:linear-gradient(180deg,var(--orange),var(--orange-2));box-shadow:0 0 12px var(--glow)}
+  .caption .n{font-family:'Saira Condensed';font-style:italic;font-weight:800;font-size:1rem;color:var(--orange);letter-spacing:.2em}
+  .caption h2{font-family:'Saira Condensed';font-style:italic;font-weight:800;text-transform:uppercase;font-size:clamp(1.8rem,4.5vw,3.2rem);margin-top:2px}
+  .caption p{color:var(--muted);font-size:.95rem;margin-top:6px}
+
+  /* ---------- SECTIONS ---------- */
+  .sec{padding:110px 0;position:relative;border-top:1px solid var(--line)}
+  .sec-head{text-align:center;max-width:720px;margin:0 auto 60px}
+  .sec-head .kick{font-family:'Saira Condensed';font-style:italic;font-weight:700;letter-spacing:.26em;text-transform:uppercase;font-size:.78rem;color:var(--orange)}
+  .sec-head h2{font-size:clamp(2.2rem,5vw,3.6rem);font-weight:800;margin:14px 0 14px}
+  .sec-head p{color:var(--muted);font-size:1.05rem}
+
+  /* features */
+  .feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+  .feat{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:16px;padding:30px 26px;transition:.3s var(--ease);position:relative;overflow:hidden}
+  .feat::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,106,26,.12),transparent 70%);opacity:0;transition:.3s}
+  .feat:hover{transform:translateY(-6px);border-color:var(--line-2)}
+  .feat:hover::before{opacity:1}
+  .feat .ic{width:56px;height:56px;border-radius:14px;background:rgba(255,106,26,.12);border:1px solid rgba(255,106,26,.3);display:grid;place-items:center;color:var(--orange);margin-bottom:20px;position:relative}
+  .feat .ic svg{width:28px;height:28px}
+  .feat h3{font-family:'Saira Condensed';font-style:italic;font-weight:700;text-transform:uppercase;font-size:1.4rem;margin-bottom:8px}
+  .feat p{color:var(--muted);font-size:.92rem;position:relative}
+
+  /* 360 viewer */
+  .viewer-wrap{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+  .viewer{position:relative;aspect-ratio:1/1;background:radial-gradient(circle at 50% 45%,#101013,#060607 72%);border:1px solid var(--line);border-radius:24px;overflow:hidden;cursor:grab;touch-action:none}
+  .viewer:active{cursor:grabbing}
+  .viewer .zoomer{position:absolute;inset:0;transition:transform .25s var(--ease)}
+  .viewer .badge{position:absolute;top:16px;left:16px;font-family:'Saira Condensed';font-style:italic;font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.74rem;color:var(--orange);border:1px solid rgba(255,106,26,.4);background:rgba(255,106,26,.08);padding:6px 12px;border-radius:999px;z-index:5}
+  .viewer .drag-tip{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-family:'Saira Condensed';font-style:italic;text-transform:uppercase;letter-spacing:.14em;font-size:.72rem;color:var(--muted-2);z-index:5;display:flex;align-items:center;gap:8px;transition:opacity .3s}
+  .viewer.touched .drag-tip{opacity:0}
+  .zoom-ctrl{position:absolute;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:5}
+  .zoom-ctrl button{width:38px;height:38px;border-radius:10px;border:1px solid var(--line-2);background:rgba(20,20,24,.8);color:var(--ink);font-size:1.3rem;cursor:pointer;display:grid;place-items:center;transition:.2s}
+  .zoom-ctrl button:hover{border-color:var(--orange);color:var(--orange)}
+  .viewer-info h2{font-size:clamp(2rem,4vw,3rem);font-weight:800;margin-bottom:16px}
+  .viewer-info .kick{font-family:'Saira Condensed';font-style:italic;font-weight:700;letter-spacing:.26em;text-transform:uppercase;font-size:.78rem;color:var(--orange)}
+  .viewer-info ul{list-style:none;margin:22px 0 28px;display:grid;gap:14px}
+  .viewer-info li{display:flex;gap:13px;align-items:flex-start;color:var(--muted)}
+  .viewer-info li svg{width:22px;height:22px;color:var(--orange);flex:none;margin-top:1px}
+  .viewer-info li b{color:var(--ink);font-weight:600}
+
+  /* performance */
+  .perf{background:var(--bg-2)}
+  .perf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+  .ring-card{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:18px;padding:30px;text-align:center;transition:.3s var(--ease)}
+  .ring-card:hover{transform:translateY(-5px);border-color:var(--line-2)}
+  .ring{width:140px;height:140px;margin:0 auto 18px;position:relative}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:11}
+  .ring .bar{fill:none;stroke:var(--orange);stroke-width:11;stroke-linecap:round;stroke-dasharray:377;stroke-dashoffset:377;transition:stroke-dashoffset 1.4s var(--ease);filter:drop-shadow(0 0 6px var(--glow))}
+  .ring .val{position:absolute;inset:0;display:grid;place-items:center;font-family:'Saira Condensed';font-style:italic;font-weight:800;font-size:2.3rem}
+  .ring-card h3{font-family:'Saira Condensed';font-style:italic;font-weight:700;text-transform:uppercase;font-size:1.25rem}
+  .ring-card p{color:var(--muted);font-size:.86rem;margin-top:6px}
+
+  /* CTA */
+  .cta-band{text-align:center;padding:120px 28px;position:relative;overflow:hidden;border-top:1px solid var(--line)}
+  .cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 120%,rgba(255,106,26,.28),transparent 60%)}
+  .cta-band .disp{font-size:clamp(2.6rem,8vw,6rem);font-weight:800;position:relative}
+  .cta-band p{color:var(--muted);max-width:520px;margin:18px auto 32px;position:relative;font-size:1.1rem}
+
+  /* footer */
+  footer{background:var(--bg-2);border-top:1px solid var(--line);padding:60px 0 28px}
+  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:34px;margin-bottom:44px}
+  .foot-brand p{color:var(--muted);font-size:.9rem;margin:16px 0;max-width:280px}
+  .socials{display:flex;gap:10px}
+  .socials a{width:38px;height:38px;border-radius:10px;border:1px solid var(--line-2);display:grid;place-items:center;color:var(--muted);transition:.2s}
+  .socials a:hover{border-color:var(--orange);color:var(--orange);transform:translateY(-3px)}
+  .socials svg{width:17px;height:17px}
+  .fcol h4{font-family:'Saira Condensed';font-style:italic;font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.82rem;color:var(--muted-2);margin-bottom:16px}
+  .fcol a{display:block;color:var(--muted);font-size:.9rem;padding:6px 0;transition:.2s}
+  .fcol a:hover{color:var(--orange);padding-left:5px}
+  .fbot{border-top:1px solid var(--line);padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;color:var(--muted-2);font-size:.84rem}
+
+  .reveal{opacity:0;transform:translateY(30px);transition:.7s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+  .toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,160%);background:var(--orange);color:#120a04;font-family:'Saira Condensed';font-style:italic;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:13px 24px;border-radius:10px;z-index:80;transition:.4s var(--ease)}
+  .toast.show{transform:translate(-50%,0)}
+
+  @media(max-width:980px){
+    .feat-grid{grid-template-columns:1fr 1fr}
+    .perf-grid{grid-template-columns:1fr 1fr}
+    .viewer-wrap{grid-template-columns:1fr;gap:32px}
+    .foot-grid{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:720px){
+    .nav-links{position:fixed;inset:72px 0 auto 0;flex-direction:column;background:rgba(7,7,8,.97);backdrop-filter:blur(16px);padding:12px;border-bottom:1px solid var(--line);transform:translateY(-130%);transition:.35s var(--ease)}
+    .nav-links.open{transform:none}
+    .burger{display:flex}
+    .vehicle{width:64vw;max-width:340px;left:50%!important;right:auto!important;transform:translate(-50%,-50%);z-index:1;opacity:.16!important}
+    .feat-grid,.perf-grid,.foot-grid{grid-template-columns:1fr}
+  }
+  @media(max-height:760px){
+    .travel{width:min(40vh,340px);height:min(40vh,340px)}
+    .hero-text{padding:calc(72px + 1vh) 16px 5vh}
+    .hero-text h1{font-size:clamp(1.9rem,6vh,4.2rem)}
+    .caption{bottom:6vh}
+    .scroll-hint{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){
+    #heroTyre,.hero-text *{animation:none!important;opacity:1!important}
+    .tyre360 .fb{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header id="header">
+  <div class="wrap nav">
+    <a href="#home" class="brand"><span class="mk"></span>GRIP<b>93</b></a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#home">Home</a>
+      <a href="#features">Features</a>
+      <a href="#viewer">360° View</a>
+      <a href="#performance">Performance</a>
+      <a href="product.html">Shop</a>
+    </nav>
+    <a href="product.html" class="btn btn-orange" style="padding:11px 22px;font-size:.95rem">Shop Now</a>
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="progress"><span id="prog"></span></div>
+
+<!-- STAGE: HERO + SCROLL JOURNEY (one travelling tyre) -->
+<section class="stage" id="stage">
+  <div class="sticky" id="home">
+    <div class="glow o"></div>
+
+    <!-- vehicles -->
+    <div class="vehicle veh-car" aria-hidden="true">
+      <svg viewBox="0 0 520 200">
+        <path class="body" d="M20 150 q30-2 55-6 q35-50 95-58 q70-10 130 2 q45 9 95 40 q40 4 75 14 q22 7 22 22 l-2 14 q-2 8-12 8 l-60 0 a26 26 0 0 0-52 0 l-205 0 a24 24 0 0 0-48 0 l-22 0 q-12 0-14-12 z"/>
+        <path class="glass" d="M180 92 q55-30 120-22 q34 5 62 26 q-120 6-182-4z"/>
+        <circle class="accent" cx="118" cy="156" r="26"/><circle class="accent" cx="375" cy="156" r="26"/>
+      </svg>
+    </div>
+    <div class="vehicle veh-suv" aria-hidden="true">
+      <svg viewBox="0 0 520 220">
+        <path class="body" d="M28 158 l8-66 q4-30 36-34 l150-8 q26-2 46 14 l66 52 q60 4 110 18 q20 6 20 24 l0 16 q0 8-10 8 l-58 0 a28 28 0 0 0-56 0 l-210 0 a26 26 0 0 0-52 0 l-28 0 q-12 0-12-12 z"/>
+        <path class="glass" d="M70 96 l6-30 q2-14 18-15 l128-7 q18-1 32 11 l40 33 q-118 8-224 0z"/>
+        <line class="accent" x1="150" y1="58" x2="156" y2="120"/>
+        <circle class="accent" cx="118" cy="162" r="30"/><circle class="accent" cx="392" cy="162" r="30"/>
+      </svg>
+    </div>
+    <div class="vehicle veh-moto" aria-hidden="true">
+      <svg viewBox="0 0 420 240">
+        <circle class="accent" cx="86" cy="170" r="46"/><circle class="accent" cx="330" cy="170" r="46"/>
+        <path class="body" d="M86 170 l60-66 l70 0 l30-34 l44 6 l-8 28 l-26 0 l-30 38 l54 64 l-40 0 l-44-58 l-44 50 z"/>
+        <path class="accent" d="M250 70 l44 6 M120 104 l66 0" fill="none"/>
+      </svg>
+    </div>
+
+    <!-- the one travelling tyre -->
+    <div class="travel"><div class="tyre360" id="heroTyre"><div class="fb"></div></div></div>
+
+    <!-- hero text -->
+    <div class="hero-text">
+      <div class="ht-top">
+        <div class="kick">Performance Tyre Co. · Est. 1993</div>
+        <h1 class="disp">GRIP<b> 93</b></h1>
+      </div>
+      <div class="ht-bottom">
+        <div class="tag">One Tyre. Every Journey.</div>
+        <div class="cta">
+          <a href="product.html" class="btn btn-orange">Shop Now
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="#features" class="btn btn-line">Explore</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- journey caption -->
+    <div class="caption" id="caption">
+      <div class="n" id="capN">01</div>
+      <h2 class="disp" id="capT">Sports Car</h2>
+      <p id="capP">Race-bred grip that holds the line through every apex.</p>
+    </div>
+
+    <div class="scroll-hint"><span>Scroll</span><span class="ln"></span></div>
+    <div class="grain"></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="sec" id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kick">Engineering</div>
+      <h2 class="disp">Built To Perform</h2>
+      <p>Every Grip 93 tyre is engineered around four pillars of confidence.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></div>
+        <h3>Strong Grip</h3>
+        <p>High-silica compound bites cold or hot tarmac for shorter stops and surefooted cornering.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0zM12 7v5l3 3"/></svg></div>
+        <h3>Long Life</h3>
+        <p>Reinforced steel-belt casing and even wear deliver up to 70,000 km of dependable mileage.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h3>Road Safety</h3>
+        <p>Run-flat construction and class-A wet braking keep you in control when it matters most.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="4"/></svg></div>
+        <h3>All-Weather</h3>
+        <p>Aqua-channel tread clears water fast and grips in heat, rain, and cold with one tyre, year-round.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 360 VIEWER -->
+<section class="sec" id="viewer">
+  <div class="wrap viewer-wrap">
+    <div class="viewer reveal" id="viewer360">
+      <span class="badge">360° · Drag to rotate</span>
+      <div class="zoomer"><div class="tyre360" id="viewTyre"><div class="fb"></div></div></div>
+      <div class="drag-tip">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>
+        Drag · Scroll to zoom
+      </div>
+      <div class="zoom-ctrl">
+        <button id="zin" aria-label="Zoom in">+</button>
+        <button id="zout" aria-label="Zoom out">−</button>
+      </div>
+    </div>
+    <div class="viewer-info reveal">
+      <div class="kick">Inspect Every Detail</div>
+      <h2 class="disp">See It From Every Angle</h2>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><span><b>Drag</b> left or right to spin the full 360° view.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><span><b>Zoom in</b> to inspect the directional tread pattern.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><span>Read the <b>GRIP 93 sidewall branding</b> and 225/45 R17 94W XL spec.</span></li>
+      </ul>
+      <a href="product.html" class="btn btn-orange">View Full Specs
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PERFORMANCE -->
+<section class="sec perf" id="performance">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kick">Tested · Rated · Proven</div>
+      <h2 class="disp">Performance Ratings</h2>
+      <p>Independently scored across the metrics that define a great tyre.</p>
+    </div>
+    <div class="perf-grid">
+      <div class="ring-card reveal" data-score="96">
+        <div class="ring"><svg width="140" height="140" viewBox="0 0 140 140"><circle class="track" cx="70" cy="70" r="60"/><circle class="bar" cx="70" cy="70" r="60"/></svg><div class="val">0</div></div>
+        <h3>Grip Rating</h3><p>Dry &amp; wet traction</p>
+      </div>
+      <div class="ring-card reveal" data-score="94">
+        <div class="ring"><svg width="140" height="140" viewBox="0 0 140 140"><circle class="track" cx="70" cy="70" r="60"/><circle class="bar" cx="70" cy="70" r="60"/></svg><div class="val">0</div></div>
+        <h3>Durability</h3><p>Casing &amp; build strength</p>
+      </div>
+      <div class="ring-card reveal" data-score="92">
+        <div class="ring"><svg width="140" height="140" viewBox="0 0 140 140"><circle class="track" cx="70" cy="70" r="60"/><circle class="bar" cx="70" cy="70" r="60"/></svg><div class="val">0</div></div>
+        <h3>Mileage</h3><p>Tread life &amp; wear</p>
+      </div>
+      <div class="ring-card reveal" data-score="97">
+        <div class="ring"><svg width="140" height="140" viewBox="0 0 140 140"><circle class="track" cx="70" cy="70" r="60"/><circle class="bar" cx="70" cy="70" r="60"/></svg><div class="val">0</div></div>
+        <h3>Safety</h3><p>Braking &amp; stability</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-band">
+  <div class="wrap">
+    <h2 class="disp">One Tyre. Every Journey.</h2>
+    <p>Join thousands of drivers who trust Grip 93 for confidence in every corner.</p>
+    <a href="product.html" class="btn btn-orange">Shop Grip 93
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#home" class="brand"><span class="mk"></span>GRIP<b>93</b></a>
+        <p>Premium performance tyres engineered for maximum grip in every condition. Since 1993.</p>
+        <div class="socials">
+          <a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.5 8.6L23 22h-6.8l-5.3-7-6.1 7H1.7l8-9.2L1 2h7l4.8 6.4zm-2.4 18h1.9L7.6 4H5.6z"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12s0-3.5-.4-5a2.6 2.6 0 0 0-1.8-1.8C18.2 4.8 12 4.8 12 4.8s-6.2 0-7.8.4A2.6 2.6 0 0 0 2.4 7C2 8.5 2 12 2 12s0 3.5.4 5a2.6 2.6 0 0 0 1.8 1.8c1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.6 2.6 0 0 0 1.8-1.8c.4-1.5.4-5 .4-5z"/><path d="m10 15 5-3-5-3z" fill="currentColor"/></svg></a>
+        </div>
+      </div>
+      <div class="fcol"><h4>Product</h4><a href="product.html">Shop Tyres</a><a href="#viewer">360° View</a><a href="#performance">Performance</a><a href="#features">Features</a></div>
+      <div class="fcol"><h4>Company</h4><a href="#">About Us</a><a href="#">Dealers</a><a href="#">Warranty</a><a href="#">Contact</a></div>
+      <div class="fcol"><h4>Support</h4><a href="#">Fitment Guide</a><a href="#">Tyre Care</a><a href="#">FAQ</a><a href="#">Track Order</a></div>
+    </div>
+    <div class="fbot"><span>© 2026 Grip 93 Performance Tyre Co.</span><span>One Tyre. Every Journey.</span></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ============ 360 TYRE ENGINE ============ */
+  // Frames produced by scripts/slice_360.py from your 360 sheet.
+  const FRAMES = ['assets/360/01.png','assets/360/02.png','assets/360/03.png','assets/360/04.png',
+                  'assets/360/05.png','assets/360/06.png','assets/360/07.png','assets/360/08.png'];
+
+  function buildTyre(el){
+    const imgs = FRAMES.map((src,i)=>{
+      const im = document.createElement('img');
+      im.className='frame'; im.src=src; im.alt='Grip 93 tyre';
+      if(i===0) im.classList.add('on');
+      el.appendChild(im); return im;
+    });
+    let ok=0, current=0;
+    imgs.forEach(im=>{
+      im.addEventListener('load', ()=>{ if(++ok===1) el.classList.add('has-frames'); });
+      im.addEventListener('error', ()=>{}); // keep CSS fallback if frames missing
+    });
+    return {
+      set(i){ i=((i%FRAMES.length)+FRAMES.length)%FRAMES.length; if(i===current) return;
+        imgs[current].classList.remove('on'); imgs[i].classList.add('on'); current=i; },
+      get(){ return current; },
+      count: FRAMES.length
+    };
+  }
+
+  const heroTyre = buildTyre(document.getElementById('heroTyre'));
+  const viewTyre = buildTyre(document.getElementById('viewTyre'));
+
+  /* ============ HERO INTRO ============ */
+  if('scrollRestoration' in history) history.scrollRestoration='manual';  // always open on the hero
+  window.scrollTo(0,0);
+  window.addEventListener('load', ()=> requestAnimationFrame(()=> document.body.classList.add('ready')));
+  // start sooner in case load is slow
+  setTimeout(()=>document.body.classList.add('ready'), 400);
+
+  /* ============ SCROLL JOURNEY (continuous, lerped) ============ */
+  const stage  = document.getElementById('stage');
+  const travel = document.querySelector('.travel');
+  const glow   = document.querySelector('.glow.o');
+  const prog   = document.getElementById('prog');
+  const capBox = document.getElementById('caption');
+  const capN=document.getElementById('capN'), capT=document.getElementById('capT'), capP=document.getElementById('capP');
+  const vehEls = { car:document.querySelector('.veh-car'), suv:document.querySelector('.veh-suv'), moto:document.querySelector('.veh-moto') };
+  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  // tyre path keyframes across stage progress p — dx:vw, dy:vh, s:scale, op:opacity
+  const KEYS = [
+    {p:0.06, dx:0,   dy:0,  s:1.00, op:1},
+    {p:0.32, dx:26,  dy:0,  s:0.86, op:1},
+    {p:0.56, dx:-26, dy:0,  s:0.86, op:1},
+    {p:0.80, dx:16,  dy:-3, s:0.76, op:1},
+    {p:0.96, dx:0,   dy:-8, s:0.60, op:0}
+  ];
+  const SCENES = {
+    car: {p:0.32, cap:['01','Sports Car','Race-bred grip that holds the line through every apex.']},
+    suv: {p:0.56, cap:['02','SUV','Load-rated strength and stability for the whole family.']},
+    moto:{p:0.80, cap:['03','Motorcycle','Lean-confident traction for two wheels on any road.']}
+  };
+  const smooth=t=>t*t*(3-2*t), lerp=(a,b,t)=>a+(b-a)*t;
+  function sample(p){
+    if(p<=KEYS[0].p) return KEYS[0];
+    for(let i=0;i<KEYS.length-1;i++){
+      const a=KEYS[i], b=KEYS[i+1];
+      if(p<=b.p){ const t=smooth((p-a.p)/(b.p-a.p));
+        return {dx:lerp(a.dx,b.dx,t), dy:lerp(a.dy,b.dy,t), s:lerp(a.s,b.s,t), op:lerp(a.op,b.op,t)}; }
+    }
+    return KEYS[KEYS.length-1];
+  }
+
+  const progress = ()=>{ const tot=stage.offsetHeight-innerHeight; return tot>0 ? Math.min(1,Math.max(0,-stage.getBoundingClientRect().top/tot)) : 0; };
+  let af=0, lastCap='', ticking=false;
+  function frame(){
+    ticking=false;
+    const p = progress();
+
+    // page scroll progress bar
+    const dh = document.documentElement.scrollHeight - innerHeight;
+    prog.style.height = (dh>0 ? scrollY/dh*100 : 0) + '%';
+
+    // tyre travel
+    const k = sample(p);
+    if(!reduce){
+      travel.style.transform = `translate(calc(-50% + ${k.dx}vw), calc(-50% + ${k.dy}vh)) scale(${k.s})`;
+      travel.style.opacity = k.op;
+      if(glow) glow.style.transform = `translate(-50%,-50%) translateX(${k.dx*0.85}vw)`;
+    }
+    stage.classList.toggle('journey', p>0.12);
+
+    // vehicles + caption by proximity
+    const WIN=0.17; let best=null, bestO=0;
+    for(const key in SCENES){
+      const o = Math.max(0, 1-Math.abs(p-SCENES[key].p)/WIN);
+      vehEls[key].style.opacity = o;
+      if(o>bestO){ bestO=o; best=key; }
+    }
+    if(best && bestO>0.12){
+      if(best!==lastCap){ const c=SCENES[best].cap; capN.textContent=c[0]; capT.textContent=c[1]; capP.textContent=c[2]; lastCap=best; }
+      capBox.style.opacity = Math.min(1,(bestO-0.12)/0.5);
+    } else { capBox.style.opacity=0; lastCap=''; }
+
+    // rotation — scroll-linked once moving (≈3 turns)
+    if(p>=0.05) heroTyre.set(Math.floor(p*heroTyre.count*3)%heroTyre.count);
+  }
+  function tick(){ if(!ticking){ ticking=true; requestAnimationFrame(frame); } }
+  addEventListener('scroll', tick, {passive:true});
+  addEventListener('resize', tick);
+  frame();
+
+  // gentle hero auto-rotate, only while parked at the very top
+  setInterval(()=>{ if(!reduce && progress()<0.05){ af=(af+1)%heroTyre.count; heroTyre.set(af); } }, 140);
+
+  /* ============ 360 DRAG VIEWER ============ */
+  const vp = document.getElementById('viewer360');
+  const zoomer = vp.querySelector('.zoomer');
+  let dragging=false, lastX=0, acc=0, zoom=1;
+  const SENS = 14; // px per frame
+
+  vp.addEventListener('pointerdown', e=>{ dragging=true; lastX=e.clientX; vp.classList.add('touched'); vp.setPointerCapture(e.pointerId); });
+  vp.addEventListener('pointermove', e=>{
+    if(!dragging) return;
+    acc += (e.clientX - lastX); lastX=e.clientX;
+    while(Math.abs(acc)>=SENS){
+      if(acc>0){ viewTyre.set(viewTyre.get()-1); acc-=SENS; }
+      else     { viewTyre.set(viewTyre.get()+1); acc+=SENS; }
+    }
+  });
+  const endDrag=()=>dragging=false;
+  vp.addEventListener('pointerup', endDrag);
+  vp.addEventListener('pointercancel', endDrag);
+  vp.addEventListener('pointerleave', endDrag);
+
+  function setZoom(z){ zoom=Math.min(2.4, Math.max(1, z)); zoomer.style.transform=`scale(${zoom})`; }
+  vp.addEventListener('wheel', e=>{ e.preventDefault(); setZoom(zoom + (e.deltaY<0?0.18:-0.18)); }, {passive:false});
+  document.getElementById('zin').addEventListener('click', ()=>setZoom(zoom+0.3));
+  document.getElementById('zout').addEventListener('click', ()=>setZoom(zoom-0.3));
+  // gentle idle auto-spin for the viewer until first interaction
+  let vIdle=true; vp.addEventListener('pointerdown',()=>vIdle=false,{once:true});
+  setInterval(()=>{ if(vIdle) viewTyre.set(viewTyre.get()+1); }, 700);
+
+  /* ============ REVEAL + PERFORMANCE RINGS ============ */
+  const C = 2*Math.PI*60; // ring circumference
+  function fillRing(card){
+    const score=+card.dataset.score, bar=card.querySelector('.bar'), val=card.querySelector('.val');
+    bar.style.strokeDashoffset = C*(1 - score/100);
+    let cur=0; const step=score/45;
+    const t=setInterval(()=>{ cur+=step; if(cur>=score){cur=score;clearInterval(t);} val.textContent=(cur/10).toFixed(1); },18);
+  }
+  const io=new IntersectionObserver(es=>es.forEach(en=>{
+    if(en.isIntersecting){ en.target.classList.add('in');
+      if(en.target.classList.contains('ring-card')) fillRing(en.target);
+      io.unobserve(en.target); }
+  }),{threshold:.2});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  /* ============ NAV ============ */
+  const header=document.getElementById('header');
+  addEventListener('scroll', ()=>header.classList.toggle('scrolled', scrollY>20), {passive:true});
+  const burger=document.getElementById('burger'), navLinks=document.getElementById('navLinks');
+  burger.addEventListener('click', ()=>navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>navLinks.classList.remove('open')));
+
+  let tt; function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2200);}
+</script>
+</body>
+</html>
