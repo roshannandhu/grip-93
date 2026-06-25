@@ -191,7 +191,7 @@ export default function Page() {
             <div>
               <div className="font-display text-[clamp(1rem,2.4vw,1.6rem)] font-medium uppercase tracking-[0.18em] text-white/90">One Tyre. Every Journey.</div>
               <div className="mt-6 flex flex-wrap justify-center gap-3.5">
-                <a href="#shop" className="rounded-lg bg-flame px-7 py-3.5 font-display font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Shop Tyres →</a>
+                <a href="/shop" className="rounded-lg bg-flame px-7 py-3.5 font-display font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Shop Tyres →</a>
                 <a href="#features" className="rounded-lg border border-white/20 px-7 py-3.5 font-display font-bold uppercase tracking-wide text-white transition hover:border-flame hover:text-flame">Features</a>
               </div>
               <div className="mt-8 font-display text-[10px] uppercase tracking-[0.3em] text-white/40">Scroll to spin ↓</div>

@@ -110,7 +110,7 @@ export default function ShopClient() {
 
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
         {/* filters */}
-        <aside className={`${showFilters ? "block" : "hidden"} space-y-5 self-start rounded-2xl glass p-5 lg:sticky lg:top-24 lg:block`}>
+        <aside className={`${showFilters ? "block" : "hidden"} space-y-5 self-start rounded-2xl glass p-5 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto`}>
           <div>
             <div className="font-display text-sm font-bold uppercase tracking-wide text-white/80">Sort</div>
             <select value={sort} onChange={(e) => setSort(e.target.value)} className="mt-2 w-full rounded-lg border border-white/15 bg-ink-700/60 px-3 py-2 text-sm outline-none focus:border-flame">

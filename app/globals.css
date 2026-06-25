@@ -11,10 +11,13 @@ html {
   background: #070708;
   color: #f5f5f6;
   -webkit-font-smoothing: antialiased;
+  color-scheme: dark; /* native controls (select popup, scrollbars) render dark + readable */
 }
 body {
   background: #070708;
-  overflow-x: hidden;
+  /* `clip` (not `hidden`) prevents horizontal overflow WITHOUT making body a scroll
+     container — `hidden` here breaks position:sticky (e.g. the shop sort/filter sidebar). */
+  overflow-x: clip;
 }
 
 /* Lenis */
