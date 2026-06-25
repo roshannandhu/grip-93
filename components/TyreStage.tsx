@@ -33,12 +33,24 @@ function sample(p: number) {
   return KEYS[KEYS.length - 1];
 }
 
-const HOME = new THREE.Vector3(0, 0, 7);
-
 // shared intro state, tweened by the IntroSplash GSAP timeline
 export type IntroState = { active: boolean; t: number; kick: number };
 const INTRO_X = -8; // off-screen left start
 const ROLL_IN_TURNS = 3; // rolling spins resolving to upright as it arrives
+
+// Responsive camera distance so the tyre always fits the viewport. A perspective camera's
+// projected size is driven by viewport HEIGHT, but the sideways tyre is constrained by WIDTH —
+// on tall/narrow phones it overflows. Pull the camera back based on the horizontal FOV (aspect),
+// with extra margin in portrait so the tyre reads comfortably small on phones.
+const VFOV = (42 * Math.PI) / 180;
+const FIT_R = 2.7; // tyre bounding radius (world units)
+function fitZ(aspect: number) {
+  const hfov = 2 * Math.atan(Math.tan(VFOV / 2) * aspect);
+  const minFov = Math.min(VFOV, hfov);
+  const margin = aspect < 1 ? 1.25 : 1.08;
+  const z = (FIT_R / Math.sin(minFov / 2)) * margin;
+  return Math.max(6, Math.min(22, z));
+}
 
 function Rig({
   progress,
@@ -50,13 +62,14 @@ function Rig({
   const pose = useRef<THREE.Group>(null); // tilt + scale (centered)
   const yaw = useRef<THREE.Group>(null); // vertical-axis turntable
   const roll = useRef<THREE.Group>(null); // axle spin (rolling)
-  const { camera } = useThree();
+  const { camera, size } = useThree();
 
   useFrame((_, dt) => {
     const g = pose.current, y = yaw.current, r = roll.current;
     if (!g || !y || !r) return;
     const d = Math.min(dt, 0.05);
     const k = 1 - Math.pow(0.001, d);
+    const fz = fitZ(size.width / size.height); // responsive: keep the tyre in-frame on any device
 
     const intro = introRef?.current;
     if (intro?.active) {
@@ -69,7 +82,7 @@ function Rig({
       g.rotation.x = THREE.MathUtils.lerp(-0.45, hero.tilt, tt);
       y.rotation.y = hero.yaw;
       r.rotation.x = -(1 - tt) * ROLL_IN_TURNS * Math.PI * 2; // rolling, lands upright at t=1
-      camera.position.set(HOME.x, HOME.y, HOME.z);
+      camera.position.set(0, 0, fz);
       camera.lookAt(0, 0, 0);
       return;
     }
@@ -84,10 +97,10 @@ function Rig({
     // axle roll: accelerates with scroll (p^1.6) and is a whole number of turns → upright at p=1
     r.rotation.x = Math.pow(p, 1.6) * TURNS * Math.PI * 2;
 
-    // keep camera home (cheap, stable)
-    camera.position.x += (HOME.x - camera.position.x) * k;
-    camera.position.y += (HOME.y - camera.position.y) * k;
-    camera.position.z += (HOME.z - camera.position.z) * k;
+    // ease camera to the responsive fit distance (centered)
+    camera.position.x += (0 - camera.position.x) * k;
+    camera.position.y += (0 - camera.position.y) * k;
+    camera.position.z += (fz - camera.position.z) * k;
     camera.lookAt(0, 0, 0);
   });
 
