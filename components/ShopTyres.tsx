@@ -34,7 +34,7 @@ function Card({
 }) {
   return (
     <div
-      className="card-3d group relative h-[360px] w-[260px] shrink-0 select-none transition-transform duration-200 hover:z-20 sm:h-[380px] sm:w-[280px] md:hover:scale-[1.06]"
+      className="card-3d group relative h-[320px] w-[208px] shrink-0 select-none transition-transform duration-200 hover:z-20 sm:h-[380px] sm:w-[280px] md:hover:scale-[1.06]"
       onMouseLeave={() => flipped && onFlip(null)} // moving the mouse away flips it back
     >
       <div className={`card-inner relative h-full w-full ${flipped ? "is-flipped" : ""}`}>
@@ -49,16 +49,16 @@ function Card({
           >
             ⤢
           </button>
-          <div className="relative grid h-[215px] place-items-center p-4 sm:h-[230px]">
+          <div className="relative grid h-[170px] place-items-center p-4 sm:h-[230px]">
             <img src="/cards/grip93-34.webp" alt={`GRIP 93 ${t.name}`} className="max-h-full drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)]" draggable={false} />
           </div>
-          <div className="relative px-5">
-            <div className="font-display text-xs font-bold uppercase tracking-[0.2em] text-flame">{t.tag}</div>
-            <h3 className="font-display mt-1 text-2xl font-extrabold leading-none">GRIP 93 <span className="text-white/90">{t.name}</span></h3>
-            <div className="mt-2 text-sm text-white/50">{t.size}</div>
-            <div className="mt-3 flex items-center justify-between">
-              <span className="font-display text-2xl font-extrabold">${t.price}</span>
-              <span className="rounded-lg bg-flame px-4 py-2 font-display text-xs font-bold uppercase tracking-wide text-[#120a04]">Shop</span>
+          <div className="relative px-4 sm:px-5">
+            <div className="font-display text-[10px] font-bold uppercase tracking-[0.2em] text-flame sm:text-xs">{t.tag}</div>
+            <h3 className="font-display mt-1 text-lg font-extrabold leading-none sm:text-2xl">GRIP 93 <span className="text-white/90">{t.name}</span></h3>
+            <div className="mt-1.5 text-xs text-white/50 sm:mt-2 sm:text-sm">{t.size}</div>
+            <div className="mt-2.5 flex items-center justify-between sm:mt-3">
+              <span className="font-display text-xl font-extrabold sm:text-2xl">${t.price}</span>
+              <span className="rounded-lg bg-flame px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide text-[#120a04] sm:px-4 sm:py-2">Shop</span>
             </div>
           </div>
         </div>
@@ -72,20 +72,20 @@ function Card({
           >
             ↩
           </button>
-          <div className="flex h-full flex-col p-6">
-            <div className="font-display text-xs font-bold uppercase tracking-[0.2em] text-flame">GRIP 93 {t.name}</div>
-            <h3 className="font-display mt-1 text-xl font-extrabold">Specifications</h3>
-            <div className="mt-4 space-y-3">
+          <div className="flex h-full flex-col p-5 sm:p-6">
+            <div className="font-display text-[10px] font-bold uppercase tracking-[0.2em] text-flame sm:text-xs">GRIP 93 {t.name}</div>
+            <h3 className="font-display mt-1 text-lg font-extrabold sm:text-xl">Specifications</h3>
+            <div className="mt-3 space-y-2 sm:mt-4 sm:space-y-3">
               {t.specs.map(([k, v]) => (
-                <div key={k} className="flex items-center justify-between border-b hairline pb-2 text-sm">
+                <div key={k} className="flex items-center justify-between border-b hairline pb-1.5 text-xs sm:pb-2 sm:text-sm">
                   <span className="text-white/50">{k}</span>
                   <span className="font-display font-bold">{v}</span>
                 </div>
               ))}
             </div>
-            <div className="mt-auto flex items-center justify-between pt-4">
-              <span className="font-display text-2xl font-extrabold">${t.price}</span>
-              <a href="#" className="rounded-lg bg-flame px-5 py-2.5 font-display text-sm font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light">Shop Now →</a>
+            <div className="mt-auto flex items-center justify-between pt-3 sm:pt-4">
+              <span className="font-display text-xl font-extrabold sm:text-2xl">${t.price}</span>
+              <a href="#" className="rounded-lg bg-flame px-4 py-2 font-display text-xs font-bold uppercase tracking-wide text-[#120a04] shadow-flame transition hover:bg-flame-light sm:px-5 sm:py-2.5 sm:text-sm">Shop →</a>
             </div>
           </div>
         </div>
@@ -175,11 +175,14 @@ export default function ShopTyres() {
   const [flipped, setFlipped] = useState<string | null>(null);
   return (
     <section id="shop" className="relative z-20 overflow-hidden py-20 sm:py-28">
-      <div className="reveal mx-auto mb-10 max-w-7xl px-6 sm:mb-12">
+      <div className="reveal mx-auto mb-8 max-w-7xl px-6 sm:mb-12">
         <div className="font-display text-sm font-bold uppercase tracking-[0.26em] text-flame">The Range</div>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-display text-4xl font-extrabold md:text-6xl">Shop Tyres</h2>
-          <p className="max-w-md text-sm text-white/55 sm:text-base">Hover to pause · drag to browse · tap the corner of a card for full specs.</p>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <h2 className="font-display text-3xl font-extrabold sm:text-4xl md:text-6xl">Shop Tyres</h2>
+          <p className="max-w-md text-sm text-white/55 sm:text-base">
+            <span className="hidden sm:inline">Hover to pause · drag to browse · tap the corner of a card for full specs.</span>
+            <span className="sm:hidden">Swipe to browse · tap ⤢ for specs.</span>
+          </p>
         </div>
       </div>
       <div className="space-y-4 sm:space-y-5">

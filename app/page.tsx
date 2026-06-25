@@ -39,7 +39,7 @@ export default function Page() {
   const [menu, setMenu] = useState(false);
   const introRef = useRef<IntroState>({ active: false, t: 0, kick: 0 });
   const endedRef = useRef(false);
-  const [phase, setPhase] = useState<"boot" | "intro" | "done">("boot");
+  const [phase, setPhase] = useState<"boot" | "intro" | "reveal" | "done">("boot");
 
   const unlockScroll = () => {
     document.body.style.overflow = "";
@@ -117,8 +117,10 @@ export default function Page() {
       <div className="grid-overlay pointer-events-none fixed inset-0 z-[5]" />
       <div className="vignette pointer-events-none fixed inset-0 z-[6]" />
 
-      {/* cinematic intro splash (once per session) */}
-      {phase === "intro" && <IntroSplash introRef={introRef} onDone={endIntro} />}
+      {/* cinematic intro splash (once per session) — stays mounted through the reveal morph */}
+      {(phase === "intro" || phase === "reveal") && (
+        <IntroSplash introRef={introRef} onReveal={() => setPhase("reveal")} onDone={endIntro} />
+      )}
 
       {/* scroll progress */}
       <div className="fixed right-0 top-0 z-50 h-screen w-[2px] bg-white/5">
@@ -162,11 +164,11 @@ export default function Page() {
           <section
             id="home"
             className="relative flex min-h-screen flex-col items-center justify-between px-4 pb-[8vh] pt-[calc(72px+5vh)] text-center"
-            style={{ opacity: phase === "done" ? 1 : 0, transition: "opacity .8s ease" }}
+            style={{ opacity: phase === "reveal" || phase === "done" ? 1 : 0, transition: "opacity .6s ease" }}
           >
             <div>
               <div className="font-display text-xs font-bold uppercase tracking-[0.4em] text-flame">Performance Tyre Co. · Est. 1993</div>
-              <h1 className="font-display mt-3 text-[clamp(3rem,13vw,10rem)] font-extrabold leading-[0.82] text-glow">
+              <h1 id="hero-title" className="font-display mt-3 text-[clamp(3rem,13vw,10rem)] font-extrabold leading-[0.95] pb-[0.12em] pr-[0.06em] text-glow">
                 GRIP <span className="flame-text">93</span>
               </h1>
             </div>
@@ -211,24 +213,24 @@ export default function Page() {
         <ShopTyres />
 
         {/* PERFORMANCE */}
-        <section id="performance" className="relative z-20 mx-auto max-w-7xl px-6 py-28">
+        <section id="performance" className="relative z-20 mx-auto max-w-7xl px-6 py-20 sm:py-28">
           <div className="reveal mx-auto mb-14 max-w-2xl text-center">
             <div className="font-display text-sm font-bold uppercase tracking-[0.26em] text-flame">Tested · Rated · Proven</div>
             <h2 className="font-display mt-3 text-4xl font-extrabold md:text-5xl">Performance Ratings</h2>
             <p className="mt-3 text-white/60">Independently scored across the metrics that define a great tyre.</p>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
             {RINGS.map((r) => (
-              <div key={r.t} data-ring={r.s} className="reveal rounded-2xl glass p-8 text-center">
-                <div className="relative mx-auto h-[140px] w-[140px]">
-                  <svg width="140" height="140" viewBox="0 0 140 140" className="-rotate-90">
+              <div key={r.t} data-ring={r.s} className="reveal rounded-2xl glass p-5 text-center sm:p-8">
+                <div className="relative mx-auto aspect-square w-[110px] sm:w-[140px]">
+                  <svg viewBox="0 0 140 140" className="h-full w-full -rotate-90">
                     <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="11" />
                     <circle className="ring-bar" cx="70" cy="70" r="60" fill="none" stroke="var(--flame)" strokeWidth="11" strokeLinecap="round" strokeDasharray={2 * Math.PI * 60} strokeDashoffset={2 * Math.PI * 60} style={{ filter: "drop-shadow(0 0 6px rgba(255,106,26,0.5))" }} />
                   </svg>
-                  <div className="ring-val font-display absolute inset-0 grid place-items-center text-4xl font-extrabold">0.0</div>
+                  <div className="ring-val font-display absolute inset-0 grid place-items-center text-3xl font-extrabold sm:text-4xl">0.0</div>
                 </div>
-                <h3 className="font-display mt-4 text-2xl font-bold">{r.t}</h3>
-                <p className="mt-1 text-sm text-white/55">{r.d}</p>
+                <h3 className="font-display mt-3 text-xl font-bold sm:mt-4 sm:text-2xl">{r.t}</h3>
+                <p className="mt-1 text-xs text-white/55 sm:text-sm">{r.d}</p>
               </div>
             ))}
           </div>
@@ -251,7 +253,7 @@ export default function Page() {
         </section>
 
         {/* CTA */}
-        <section className="relative z-20 overflow-hidden px-6 py-32 text-center">
+        <section className="relative z-20 overflow-hidden px-6 py-24 text-center sm:py-32">
           <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(circle at 50% 120%, rgba(255,106,26,0.28), transparent 60%)" }} />
           <h2 className="reveal font-display relative text-[clamp(2.6rem,8vw,6rem)] font-extrabold text-glow">One Tyre. Every Journey.</h2>
           <p className="reveal relative mx-auto mt-4 max-w-xl text-white/60">Join thousands of drivers who trust GRIP 93 for confidence in every corner.</p>

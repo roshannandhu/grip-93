@@ -19,12 +19,15 @@ type Particle = {
 export default function IntroSplash({
   introRef,
   onDone,
+  onReveal,
 }: {
   introRef: React.MutableRefObject<IntroState>;
   onDone: () => void;
+  onReveal?: () => void;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const shake = useRef<HTMLDivElement>(null);
+  const word = useRef<HTMLHeadingElement>(null);
   const grip = useRef<HTMLSpanElement>(null);
   const nine = useRef<HTMLSpanElement>(null);
   const ring = useRef<HTMLDivElement>(null);
@@ -171,8 +174,25 @@ export default function IntroSplash({
         }, 1.4);
       }
 
-      // 4) hand-off: fade the overlay out, revealing the hero over the same tyre
-      tl.to(root.current, { opacity: 0, duration: 0.7, ease: "power2.inOut" }, 2.35);
+      // 4) hand-off: morph the splash "GRIP 93" into the hero title (shared-element transition)
+      const heroEl = typeof document !== "undefined" ? document.getElementById("hero-title") : null;
+      const wordEl = word.current;
+      const MORPH = 2.2;
+      if (heroEl && wordEl) {
+        const h = heroEl.getBoundingClientRect();
+        const w = wordEl.getBoundingClientRect();
+        const scale = w.width ? h.width / w.width : 1;
+        const x = h.left + h.width / 2 - (w.left + w.width / 2);
+        const y = h.top + h.height / 2 - (w.top + w.height / 2);
+        tl.add(() => onReveal?.(), MORPH); // reveal hero behind the splash as the morph begins
+        tl.to(canvas.current, { opacity: 0, duration: 0.5, ease: "power1.out" }, MORPH);
+        tl.to(wordEl, { x, y, scale, duration: 0.85, ease: "power3.inOut" }, MORPH);
+        // crossfade the splash out — the identical hero title is now in the same spot
+        tl.to(root.current, { opacity: 0, duration: 0.35, ease: "power2.out" }, MORPH + 0.72);
+      } else {
+        tl.add(() => onReveal?.(), 2.2);
+        tl.to(root.current, { opacity: 0, duration: 0.7, ease: "power2.inOut" }, 2.35);
+      }
     }, root);
 
     return () => {
@@ -195,7 +215,7 @@ export default function IntroSplash({
           <div className="pointer-events-none absolute left-1/2 top-1/2 h-0 w-0">
             <div ref={ring} className="shock-ring absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2" style={{ opacity: 0 }} />
           </div>
-          <h1 className="font-display relative z-10 flex items-center gap-3 text-[clamp(3rem,14vw,11rem)] font-extrabold leading-none text-glow">
+          <h1 ref={word} className="font-display relative z-10 flex items-center gap-3 text-[clamp(3rem,14vw,11rem)] font-extrabold leading-[0.95] pb-[0.12em] text-glow">
             <span ref={grip} className="inline-block" style={{ opacity: 0 }}>GRIP</span>
             <span ref={nine} className="flame-text inline-block" style={{ opacity: 0 }}>93</span>
           </h1>
